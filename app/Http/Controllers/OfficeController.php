@@ -24,6 +24,7 @@ class OfficeController extends Controller
 //        dd($tt);
         return response()->json($tt);
 //        return response()->json('test');
+        //test
     }
 
 
