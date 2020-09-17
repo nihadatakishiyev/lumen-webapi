@@ -18,23 +18,86 @@ class OfficeController extends Controller
      */
     public function index($link)
     {
-        if ($link =='1'){
             try {
-                $res = DB::select("select top 5 su.consumer_id, c.name, sum(su.cost) as total_cost
-                from rel.ServiceUsage su
-                left join list.Consumers c on su.consumer_id = c.id
-                where cast(su.create_date as date) = cast(getdate() as date)
-                and service_usage_status_id = 1
-                group by consumer_id, c.name
-                order by total_cost desc");
+                if ($link =='1') {
+                    //top 5 consumer profits
+                    $res = DB::select("select top 5 su.consumer_id, c.name, sum(su.cost) as total_cost
+                            from rel.ServiceUsage su
+                            left join list.Consumers c on su.consumer_id = c.id
+                            where cast(su.create_date as date) = cast(getdate() as date)
+                            and service_usage_status_id = 1
+                            group by consumer_id, c.name
+                            order by total_cost desc");
+                }
+                elseif ($link == '2'){
+                    //top 5 service profits
+                    $res = DB::select('select top 5  su.service_id, s.name, sum(su.cost) as total_cost
+                                            from rel.ServiceUsage su
+                                            left join list.Services s on su.service_id = s.ID
+                                            where cast(su.create_date as date) = cast(getdate() as date)
+                                            and service_usage_status_id = 1
+                                            group by service_id, name
+                                            order by total_cost desc');
+                }
+                elseif($link == '3'){
+                    //top rewarding services( within company scope)
+                    $res = DB::select('select top 5  c.name, s.name, sum(su.cost) as total_cost
+                                            from rel.ServiceUsage su
+                                            left join list.Services s on su.service_id = s.ID
+                                            left join list.Consumers c on c.id = su.consumer_id
+                                            where cast(su.create_date as date) = cast(getdate() as date)
+                                            and service_usage_status_id = 1
+                                            group by service_id, s.name, consumer_id, c.name
+                                            order by total_cost desc');
+                }
+                elseif($link == '4'){
+                    //services success rate
+                    $res = DB::select('select top 5 s.name, sum(su.cost) as total_cost,
+                                            sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
+                                            sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
+                                            sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
+                                            from rel.ServiceUsage su
+                                            left join list.Services s on su.service_id = s.ID
+                                            where cast(su.create_date as date) = cast(getdate() as date)
+                                            group by service_id, s.name
+                                            order by unscsfl desc,success_rate');
+                }
+                elseif($link == '5'){
+                    //consumerlerin servicleri uzre success_rate top list
+                    $res = DB::select('select top 5  consumer_id, c.name, s.name, sum(su.cost) as total_cost,
+                                            sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
+                                            sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
+                                            sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
+                                            from rel.ServiceUsage su
+                                            left join list.Services s on su.service_id = s.ID
+                                            left join list.Consumers c on c.id = su.consumer_id
+                                            where cast(su.create_date as date) = cast(getdate() as date)
+                                            group by service_id, s.name, consumer_id, c.name
+                                            order by unscsfl desc,success_rate');
+                }
+                elseif($link == '6'){
+                    $res = DB::select(';with cte as (
+                                                select
+                                                ROW_NUMBER() over(partition by service_id order by sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end)) as rn,
+                                                consumer_id, c.name cons_name, s.name serv_name, sum(su.cost) as total_cost,
+                                                sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
+                                                sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
+                                                sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
+                                                from rel.ServiceUsage su
+                                                left join list.Services s on su.service_id = s.ID
+                                                left join list.Consumers c on c.id = su.consumer_id
+                                                where cast(su.create_date as date) = cast(getdate() as date)
+                                                group by service_id, s.name, consumer_id, c.name
+                                                ) select * from cte where rn = 1 and success_rate <> 100
+                                                order by success_rate');
+                }
+
                 return response($res, 200);
             }
             catch (\Exception $e){
                 return Response($e->getMessage(),  404);
             }
         }
-
-    }
 
 
 }
