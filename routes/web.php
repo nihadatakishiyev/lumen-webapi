@@ -15,5 +15,5 @@
 
 
 $router->group(['prefix' => 'api'], function ($router){
-    $router->get('/asanfinance/{link}/', 'OfficeController@index');
+    $router->get('/asanfinance/', 'OfficeController@asanFinance');
 });

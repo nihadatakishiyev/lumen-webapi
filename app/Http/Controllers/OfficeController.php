@@ -16,11 +16,9 @@ class OfficeController extends Controller
      * @param $link
      * @return void
      */
-    public function index($link)
+    public function asanFinance()
     {
             try {
-                if ($link =='1') {
-                    //top 5 consumer profits
                     $res = array(); 
                     $query1 = DB::select("select top 5 su.consumer_id, c.name, sum(su.cost) as total_cost
                             from rel.ServiceUsage su
@@ -31,9 +29,8 @@ class OfficeController extends Controller
                             order by total_cost desc");
                     $res[] = $query1;
                     $res[0]['header'] = 'top 5 consumer profits'; 
-                // }
-                // elseif ($link == '2'){
-                    //top 5 service profits
+
+
                     $query2 = DB::select('select top 5  su.service_id, s.name, sum(su.cost) as total_cost
                                             from rel.ServiceUsage su
                                             left join list.Services s on su.service_id = s.ID
@@ -43,9 +40,8 @@ class OfficeController extends Controller
                                             order by total_cost desc');
                     $res[] = $query2;
                     $res[1]['header'] = 'top 5 service profits'; 
-                // }
-                // elseif($link == '3'){
-                    //top rewarding services( within company scope
+
+
                     $query3 = DB::select('select top 5  c.name, s.name, sum(su.cost) as total_cost
                                             from rel.ServiceUsage su
                                             left join list.Services s on su.service_id = s.ID
@@ -56,9 +52,8 @@ class OfficeController extends Controller
                                             order by total_cost desc');
                     $res[] = $query3;
                     $res[2]['header'] = 'top rewarding services( within company scope'; 
-                // }
-                // elseif($link == '4'){
-                    //services success rate
+
+
                     $query4 = DB::select('select top 5 s.name, sum(su.cost) as total_cost,
                                             sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
                                             sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
@@ -70,9 +65,8 @@ class OfficeController extends Controller
                                             order by unscsfl desc,success_rate');
                     $res[] = $query4;
                     $res[3]['header'] = 'services success rate';                                           
-                // }
-                // elseif($link == '5'){
-                    //consumerlerin servicleri uzre success_rate top list
+
+
                     $query5 = DB::select('select top 5  consumer_id, c.name, s.name, sum(su.cost) as total_cost,
                                             sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
                                             sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
@@ -86,8 +80,8 @@ class OfficeController extends Controller
 
                     $res[] = $query5;
                     $res[4]['header'] = 'consumerlerin servicleri uzre success_rate top list'; 
-                // }
-                // elseif($link == '6'){
+
+
                     $query6 = DB::select(';with cte as (
                                                 select
                                                 ROW_NUMBER() over(partition by service_id order by sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end)) as rn,
@@ -105,7 +99,7 @@ class OfficeController extends Controller
 
                     $res[] = $query6;
                     $res[4]['header'] = 'consumerlerin servicleri uzre success_rate top list'; 
-                }
+                
 
                 return response(($res), 200);
             }
