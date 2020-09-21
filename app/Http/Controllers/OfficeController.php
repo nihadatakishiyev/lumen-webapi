@@ -21,27 +21,32 @@ class OfficeController extends Controller
             try {
                 if ($link =='1') {
                     //top 5 consumer profits
-                    $res = DB::select("select top 5 su.consumer_id, c.name, sum(su.cost) as total_cost
+                    $res = array(); 
+                    $query1 = DB::select("select top 5 su.consumer_id, c.name, sum(su.cost) as total_cost
                             from rel.ServiceUsage su
                             left join list.Consumers c on su.consumer_id = c.id
                             where cast(su.create_date as date) = cast(getdate() as date)
                             and service_usage_status_id = 1
                             group by consumer_id, c.name
                             order by total_cost desc");
-                }
-                elseif ($link == '2'){
+                    $res[] = $query1;
+                    $res[0]['header'] = 'top 5 consumer profits'; 
+                // }
+                // elseif ($link == '2'){
                     //top 5 service profits
-                    $res = DB::select('select top 5  su.service_id, s.name, sum(su.cost) as total_cost
+                    $query2 = DB::select('select top 5  su.service_id, s.name, sum(su.cost) as total_cost
                                             from rel.ServiceUsage su
                                             left join list.Services s on su.service_id = s.ID
                                             where cast(su.create_date as date) = cast(getdate() as date)
                                             and service_usage_status_id = 1
                                             group by service_id, name
                                             order by total_cost desc');
-                }
-                elseif($link == '3'){
-                    //top rewarding services( within company scope)
-                    $res = DB::select('select top 5  c.name, s.name, sum(su.cost) as total_cost
+                    $res[] = $query2;
+                    $res[1]['header'] = 'top 5 service profits'; 
+                // }
+                // elseif($link == '3'){
+                    //top rewarding services( within company scope
+                    $query3 = DB::select('select top 5  c.name, s.name, sum(su.cost) as total_cost
                                             from rel.ServiceUsage su
                                             left join list.Services s on su.service_id = s.ID
                                             left join list.Consumers c on c.id = su.consumer_id
@@ -49,10 +54,12 @@ class OfficeController extends Controller
                                             and service_usage_status_id = 1
                                             group by service_id, s.name, consumer_id, c.name
                                             order by total_cost desc');
-                }
-                elseif($link == '4'){
+                    $res[] = $query3;
+                    $res[2]['header'] = 'top rewarding services( within company scope'; 
+                // }
+                // elseif($link == '4'){
                     //services success rate
-                    $res = DB::select('select top 5 s.name, sum(su.cost) as total_cost,
+                    $query4 = DB::select('select top 5 s.name, sum(su.cost) as total_cost,
                                             sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
                                             sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
                                             sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
@@ -61,10 +68,12 @@ class OfficeController extends Controller
                                             where cast(su.create_date as date) = cast(getdate() as date)
                                             group by service_id, s.name
                                             order by unscsfl desc,success_rate');
-                }
-                elseif($link == '5'){
+                    $res[] = $query4;
+                    $res[3]['header'] = 'services success rate';                                           
+                // }
+                // elseif($link == '5'){
                     //consumerlerin servicleri uzre success_rate top list
-                    $res = DB::select('select top 5  consumer_id, c.name, s.name, sum(su.cost) as total_cost,
+                    $query5 = DB::select('select top 5  consumer_id, c.name, s.name, sum(su.cost) as total_cost,
                                             sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
                                             sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
                                             sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
@@ -74,9 +83,12 @@ class OfficeController extends Controller
                                             where cast(su.create_date as date) = cast(getdate() as date)
                                             group by service_id, s.name, consumer_id, c.name
                                             order by unscsfl desc,success_rate');
-                }
-                elseif($link == '6'){
-                    $res = DB::select(';with cte as (
+
+                    $res[] = $query5;
+                    $res[4]['header'] = 'consumerlerin servicleri uzre success_rate top list'; 
+                // }
+                // elseif($link == '6'){
+                    $query6 = DB::select(';with cte as (
                                                 select
                                                 ROW_NUMBER() over(partition by service_id order by sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end)) as rn,
                                                 consumer_id, c.name cons_name, s.name serv_name, sum(su.cost) as total_cost,
@@ -90,9 +102,12 @@ class OfficeController extends Controller
                                                 group by service_id, s.name, consumer_id, c.name
                                                 ) select * from cte where rn = 1 and success_rate <> 100
                                                 order by success_rate');
+
+                    $res[] = $query6;
+                    $res[4]['header'] = 'consumerlerin servicleri uzre success_rate top list'; 
                 }
 
-                return response($res, 200);
+                return response(($res), 200);
             }
             catch (\Exception $e){
                 return Response($e->getMessage(),  404);
