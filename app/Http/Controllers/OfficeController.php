@@ -28,7 +28,7 @@ class OfficeController extends Controller
                             group by consumer_id, c.name
                             order by total_cost desc");
                     $res[] = $query1;
-                    $res[0]['header'] = 'top 5 consumer profits'; 
+                    $res[0]['header'] = 'Top 5 consumer profits'; 
 
 
                     $query2 = DB::select('select top 5  su.service_id, s.name, sum(su.cost) as total_cost
@@ -39,7 +39,7 @@ class OfficeController extends Controller
                                             group by service_id, name
                                             order by total_cost desc');
                     $res[] = $query2;
-                    $res[1]['header'] = 'top 5 service profits'; 
+                    $res[1]['header'] = 'Top 5 service profits'; 
 
 
                     $query3 = DB::select('select top 5  c.name, s.name, sum(su.cost) as total_cost
@@ -51,7 +51,7 @@ class OfficeController extends Controller
                                             group by service_id, s.name, consumer_id, c.name
                                             order by total_cost desc');
                     $res[] = $query3;
-                    $res[2]['header'] = 'top rewarding services( within company scope'; 
+                    $res[2]['header'] = 'Top rewarding services( within company scope'; 
 
 
                     $query4 = DB::select('select top 5 s.name, sum(su.cost) as total_cost,
@@ -64,7 +64,7 @@ class OfficeController extends Controller
                                             group by service_id, s.name
                                             order by unscsfl desc,success_rate');
                     $res[] = $query4;
-                    $res[3]['header'] = 'services success rate';                                           
+                    $res[3]['header'] = 'Services\' success rate';                                           
 
 
                     $query5 = DB::select('select top 5  consumer_id, c.name, s.name, sum(su.cost) as total_cost,
@@ -79,7 +79,7 @@ class OfficeController extends Controller
                                             order by unscsfl desc,success_rate');
 
                     $res[] = $query5;
-                    $res[4]['header'] = 'consumerlerin servicleri uzre success_rate top list'; 
+                    $res[4]['header'] = 'Consumerler services success_rate top list'; 
 
 
                     $query6 = DB::select(';with cte as (
@@ -98,7 +98,7 @@ class OfficeController extends Controller
                                                 order by success_rate');
 
                     $res[] = $query6;
-                    $res[5]['header'] = 'consumerlerin servicleri uzre success_rate top list'; 
+                    $res[5]['header'] = 'success rate overall'; 
                 
 
                 return response(($res), 200);
