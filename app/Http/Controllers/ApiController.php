@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mockery\Exception;
 
-class OfficeController extends Controller
+class ApiController extends Controller
 {
     /**
      * Create a new controller instance.
