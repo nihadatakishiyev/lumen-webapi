@@ -101,10 +101,10 @@ class ApiController extends Controller
                     $res[5]['header'] = 'success rate overall'; 
                 
 
-                return response(($res), 200);
+                return response(($res), 200); 
             }
             catch (\Exception $e){
-                return Response($e->getMessage(),  404);
+                return Response($e->getMessage(),  404); //status code to be updated later
             }
         }
 
