@@ -104,7 +104,7 @@ class ApiController extends Controller
                 return response(($res), 200); 
             }
             catch (\Exception $e){
-                return Response($e->getMessage(),  404); //status code to be updated later
+                return Response($e->getMessage(),  404); //status code to be updated laterwards
             }
         }
 
