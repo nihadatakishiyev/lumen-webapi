@@ -20,7 +20,7 @@ class ApiController extends Controller
     {
             try {
                     $res = array(); 
-                    $query1 = DB::select("select top 5 su.consumer_id, c.name, sum(su.cost) as total_cost
+                    $query1 = DB::select("select top 5 su.consumer_id, c.name, cast(sum(su.cost/100) as decimal(10,2)) as total_cost
                             from rel.ServiceUsage su
                             left join list.Consumers c on su.consumer_id = c.id
                             where --cast(su.create_date as date) = cast(getdate() as date) and 
@@ -30,7 +30,7 @@ class ApiController extends Controller
                     $res[] = $query1;
                     $res[0]['header'] = 'Top 5 consumer profits'; 
 
-                    // $query2 = DB::select('select top 5  su.service_id, s.name, sum(su.cost) as total_cost
+                    // $query2 = DB::select('select top 5  su.service_id, s.name, cast(sum(su.cost/100) as decimal(10,2)) as total_cost
                     //                         from rel.ServiceUsage su
                     //                         left join list.Services s on su.service_id = s.ID
                     //                         where cast(su.create_date as date) = cast(getdate() as date)
@@ -41,7 +41,7 @@ class ApiController extends Controller
                     // $res[1]['header'] = 'Top 5 service profits'; 
 
 
-                    // $query3 = DB::select('select top 5  c.name, s.name, sum(su.cost) as total_cost
+                    // $query3 = DB::select('select top 5  c.name, s.name, cast(sum(su.cost/100) as decimal(10,2)) as total_cost
                     //                         from rel.ServiceUsage su
                     //                         left join list.Services s on su.service_id = s.ID
                     //                         left join list.Consumers c on c.id = su.consumer_id
@@ -53,7 +53,7 @@ class ApiController extends Controller
                     // $res[2]['header'] = 'Top rewarding services( within company scope'; 
 
 
-                    // $query4 = DB::select('select top 5 s.name, sum(su.cost) as total_cost,
+                    // $query4 = DB::select('select top 5 s.name, cast(sum(su.cost/100) as decimal(10,2)) as total_cost,
                     //                         sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
                     //                         sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
                     //                         sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
@@ -66,7 +66,7 @@ class ApiController extends Controller
                     // $res[3]['header'] = 'Services\' success rate';                                           
 
 
-                    // $query5 = DB::select('select top 5  consumer_id, c.name, s.name, sum(su.cost) as total_cost,
+                    // $query5 = DB::select('select top 5  consumer_id, c.name, s.name, cast(sum(su.cost/100) as decimal(10,2)) as total_cost,
                     //                         sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
                     //                         sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
                     //                         sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
@@ -84,7 +84,7 @@ class ApiController extends Controller
                     // $query6 = DB::select(';with cte as (
                     //                             select
                     //                             ROW_NUMBER() over(partition by service_id order by sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end)) as rn,
-                    //                             consumer_id, c.name cons_name, s.name serv_name, sum(su.cost) as total_cost,
+                    //                             consumer_id, c.name cons_name, s.name serv_name, cast(sum(su.cost/100) as decimal(10,2)) as total_cost,
                     //                             sum(case when service_usage_status_id = 1 then 1 else 0 end) as scsfl,
                     //                             sum(case when service_usage_status_id = 2 then 1 else 0 end) as unscsfl,
                     //                             sum(case when service_usage_status_id = 1 then 1 else 0 end) * 100 / sum(case when service_usage_status_id = 1 then 1 else 1 end) as success_rate
